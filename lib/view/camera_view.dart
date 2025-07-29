@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:translate_now/utils/app_colors.dart';
 import 'package:translate_now/view_modal/image_provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
+import 'package:translate_now/widgets/language_selection_row.dart';
 
 import '../widgets/text_container.dart';
 
@@ -37,7 +38,7 @@ class _CameraViewState extends State<CameraView> {
             onPressed: () {
               imgPicker.pickImage(source: ImageSource.gallery).then((value) {
                 translationProvider.translateImage(
-                  imgPath: context.watch<ImgProvider>().imagePath,
+                  imgPath: imgPicker.imagePath,
                 );
               });
             },
@@ -53,6 +54,9 @@ class _CameraViewState extends State<CameraView> {
             child: Center(
               child: Column(
                 children: [
+                  SizedBox(height: 10),
+                  LanguageSelectRow(isScript: true),
+                  SizedBox(height: 20),
                   value.image != null
                       ? Container(
                         height: 300,
@@ -66,10 +70,17 @@ class _CameraViewState extends State<CameraView> {
                       )
                       : Icon(Icons.image, size: 200),
                   Container(height: 10, color: Colors.yellowAccent),
-                  TextContainer(isSource: true, width: 380),
+                  TextContainer(
+                    isSource: true,
+                    width: 380,
+                    isImgRecognizer: true,
+                  ),
                   Container(height: 10, color: Colors.yellowAccent),
-                  TextContainer(isSource: false, width: 380),
-
+                  TextContainer(
+                    isSource: false,
+                    width: 380,
+                    isImgRecognizer: true,
+                  ),
                   SizedBox(height: 100),
                 ],
               ),

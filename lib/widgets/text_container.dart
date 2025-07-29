@@ -7,18 +7,19 @@ import 'package:translate_now/widgets/custom_icon_button.dart';
 class TextContainer extends StatelessWidget {
   final bool isSource;
   final double width;
-  // final TextEditingController textController;
+  final bool isImgRecognizer;
+  final TextEditingController? textController;
   const TextContainer({
     super.key,
     this.isSource = false,
-    this.width = 320,
-    // required this.textController,
+    this.isImgRecognizer = false,
+    this.width = 340,
+    this.textController,
   });
 
   @override
   Widget build(BuildContext context) {
     final translationProvider = context.read<TranslationProvider>();
-    final textController = TextEditingController();
     return Container(
       width: width,
       height: 246,
@@ -65,7 +66,7 @@ class TextContainer extends StatelessWidget {
                   onTap:
                       isSource
                           ? () {
-                            textController.clear();
+                            textController!.clear();
                           }
                           : () {
                             translationProvider.setOutputText("");
@@ -77,47 +78,69 @@ class TextContainer extends StatelessWidget {
               ],
             ),
             isSource
-                ? TextFormField(
-                  controller: textController,
-                  keyboardType: TextInputType.text,
-                  maxLines: 7,
-                  style: TextStyle(fontSize: 14, height: 1.2),
-                  decoration: InputDecoration(
-                    border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    hintText: "Enter text here...",
-                    hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                )
+                ? isImgRecognizer
+                    ? Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          context.watch<TranslationProvider>().recognizedText,
+                          softWrap: true,
+                          maxLines: 8,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 15, height: 1.1),
+                        ),
+                      ),
+                    )
+                    : TextFormField(
+                      controller: textController,
+                      keyboardType: TextInputType.text,
+                      maxLines: 7,
+                      style: TextStyle(fontSize: 14, height: 1.2),
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        hintText: "Enter text here...",
+                        hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    )
                 : Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: Text(
-                      context.watch<TranslationProvider>().outputText,
+                      isImgRecognizer
+                          ? context.watch<TranslationProvider>().imgOutputText
+                          : context.watch<TranslationProvider>().outputText,
                       softWrap: true,
-                      style: TextStyle(
-                        fontSize: 16,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      maxLines: 8,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 15, height: 1.1),
                     ),
                   ),
                 ),
-            Spacer(),
+
             isSource
                 ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: () {},
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundColor: AppColors().darkBlue,
-                        child: Icon(Icons.mic, size: 28),
-                      ),
-                    ),
+                    isImgRecognizer
+                        ? Text("")
+                        : InkWell(
+                          onTap: () {},
+                          child: CircleAvatar(
+                            radius: 22,
+                            backgroundColor: AppColors().darkBlue,
+                            child: Icon(Icons.mic, size: 28),
+                          ),
+                        ),
                     InkWell(
                       onTap: () {
                         translationProvider.translateText(
-                          input: textController.text.toString(),
+                          input:
+                              isImgRecognizer
+                                  ? translationProvider.recognizedText
+                                  : textController!.text.toString(),
+                          isImgRecognizer: isImgRecognizer,
                         );
                       },
                       child: Container(
