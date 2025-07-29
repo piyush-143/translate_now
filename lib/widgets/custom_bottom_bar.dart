@@ -10,6 +10,7 @@ import 'package:translate_now/widgets/custom_icon_button.dart';
 
 import '../view/camera_view.dart';
 import '../view/chat_view.dart';
+import '../view_modal/image_provider.dart';
 
 class CustomBottomBar extends StatefulWidget {
   const CustomBottomBar({super.key});
@@ -43,6 +44,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
   @override
   Widget build(BuildContext context) {
     final indexProvider = context.watch<BottomAppBarProvider>();
+    final imgPicker = context.read<ImgProvider>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors().darkBlue,
@@ -61,7 +63,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                 )
                 : customIconButton(
                   onTap: () {
-                    Navigator.pop(context);
+                    context.read<BottomAppBarProvider>().setIndex(idx: 2);
                   },
                   icon: Icons.arrow_back_outlined,
                   size: 26,

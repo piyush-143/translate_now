@@ -4,8 +4,8 @@ import 'package:translate_now/widgets/custom_icon_button.dart';
 import '../utils/app_colors.dart';
 
 class ChatBox extends StatelessWidget {
-  bool isFav;
-  ChatBox({super.key, this.isFav = false});
+  final bool isFav;
+  const ChatBox({super.key, this.isFav = false});
 
   @override
   Widget build(BuildContext context) {

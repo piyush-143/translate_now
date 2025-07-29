@@ -6,14 +6,21 @@ import 'package:translate_now/widgets/custom_icon_button.dart';
 
 class TextContainer extends StatelessWidget {
   final bool isSource;
-  const TextContainer({super.key, this.isSource = false});
+  final double width;
+  // final TextEditingController textController;
+  const TextContainer({
+    super.key,
+    this.isSource = false,
+    this.width = 320,
+    // required this.textController,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final textController = TextEditingController();
     final translationProvider = context.read<TranslationProvider>();
+    final textController = TextEditingController();
     return Container(
-      width: 320,
+      width: width,
       height: 246,
       decoration: BoxDecoration(
         color: AppColors().lightPurple,

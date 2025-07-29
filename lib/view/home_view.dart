@@ -13,6 +13,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
