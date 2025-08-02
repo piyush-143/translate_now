@@ -55,8 +55,8 @@ class _CameraViewState extends State<CameraView> {
               child: Column(
                 children: [
                   SizedBox(height: 10),
-                  LanguageSelectRow(isScript: true),
-                  SizedBox(height: 20),
+                  LanguageSelectRow(isImg: true),
+                  SizedBox(height: 10),
                   value.image != null
                       ? Container(
                         height: 300,
@@ -69,18 +69,21 @@ class _CameraViewState extends State<CameraView> {
                         ),
                       )
                       : Icon(Icons.image, size: 200),
-                  Container(height: 10, color: Colors.yellowAccent),
+                  SizedBox(height: 10),
                   TextContainer(
                     isSource: true,
                     width: 380,
                     isImgRecognizer: true,
                   ),
-                  Container(height: 10, color: Colors.yellowAccent),
-                  TextContainer(
-                    isSource: false,
-                    width: 380,
-                    isImgRecognizer: true,
-                  ),
+                  SizedBox(height: 30),
+                  context.watch<TranslationProvider>().translationDone
+                      ? TextContainer(
+                        isSource: false,
+                        width: 380,
+                        isImgRecognizer: true,
+                      )
+                      : Container(),
+
                   SizedBox(height: 100),
                 ],
               ),

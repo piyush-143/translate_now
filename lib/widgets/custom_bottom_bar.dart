@@ -55,19 +55,10 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        leading:
-            indexProvider.index == 2
-                ? DrawerButton(
-                  color: Colors.white,
-                  style: ButtonStyle(iconSize: WidgetStatePropertyAll(28)),
-                )
-                : customIconButton(
-                  onTap: () {
-                    context.read<BottomAppBarProvider>().setIndex(idx: 2);
-                  },
-                  icon: Icons.arrow_back_outlined,
-                  size: 26,
-                ),
+        leading: DrawerButton(
+          color: Colors.white,
+          style: ButtonStyle(iconSize: WidgetStatePropertyAll(28)),
+        ),
         actions: [
           indexProvider.index == 3
               ? !indexProvider.isSelected

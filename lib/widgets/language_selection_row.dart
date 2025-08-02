@@ -1,5 +1,5 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:provider/provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
@@ -7,8 +7,8 @@ import 'package:translate_now/view_modal/translation_provider.dart';
 import '../utils/app_colors.dart';
 
 class LanguageSelectRow extends StatelessWidget {
-  final bool isScript;
-  const LanguageSelectRow({super.key, this.isScript = false});
+  final bool isImg;
+  const LanguageSelectRow({super.key, this.isImg = false});
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +33,26 @@ class LanguageSelectRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Row(
+            spacing: 15,
             children: [
-              CircleAvatar(radius: 18),
-              isScript
-                  ? _buildDropDown(
-                    isSource: false,
-                    isScript: true,
-                    languageProvider: languageProvider,
-                    context: context,
+              CircleAvatar(
+                radius: 18,
+                child: CountryFlag.fromLanguageCode(
+                  isImg ? "en" : languageProvider.sourceLanguage.bcpCode,
+                  shape: Circle(),
+                ),
+              ),
+              isImg
+                  ? Text(
+                    "english",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      color: AppColors().darkBlue,
+                    ),
                   )
                   : _buildDropDown(
                     isSource: true,
-                    isScript: false,
                     languageProvider: languageProvider,
                     context: context,
                   ),
@@ -55,11 +63,16 @@ class LanguageSelectRow extends StatelessWidget {
             children: [
               _buildDropDown(
                 isSource: false,
-                isScript: false,
                 languageProvider: languageProvider,
                 context: context,
               ),
-              CircleAvatar(radius: 18),
+              CircleAvatar(
+                radius: 18,
+                child: CountryFlag.fromLanguageCode(
+                  languageProvider.targetLanguage.bcpCode,
+                  shape: Circle(),
+                ),
+              ),
             ],
           ),
         ],
@@ -70,18 +83,15 @@ class LanguageSelectRow extends StatelessWidget {
 
 Widget _buildDropDown({
   required bool isSource,
-  required bool isScript,
   required TranslationProvider languageProvider,
   required BuildContext context,
 }) {
   return DropdownButton(
     value:
-        isScript
-            ? languageProvider.script
-            : (isSource
-                    ? languageProvider.sourceLanguage
-                    : languageProvider.targetLanguage)
-                .bcpCode,
+        (isSource
+                ? languageProvider.sourceLanguage
+                : languageProvider.targetLanguage)
+            .bcpCode,
     iconSize: 0,
     menuMaxHeight: 650,
     alignment: Alignment.center,
@@ -92,50 +102,14 @@ Widget _buildDropDown({
       color: AppColors().darkBlue,
     ),
     onChanged: (value) {
-      isScript
-          ? context.read<TranslationProvider>().setScript(value)
-          : context.read<TranslationProvider>().setLanguage(isSource, value);
+      context.read<TranslationProvider>().setLanguage(isSource, value);
     },
 
     items:
-        isScript
-            ? TextRecognitionScript.values.map<DropdownMenuItem>((script) {
-              return DropdownMenuItem<TextRecognitionScript>(
-                value: script,
-                child: Text(script.name),
-              );
-            }).toList()
-            : TranslateLanguage.values.map<DropdownMenuItem>((lang) {
-              return DropdownMenuItem<String>(
-                value: lang.bcpCode,
-                child: Text(lang.name),
-              );
-            }).toList(),
-  );
-}
-
-Widget _buildScriptDropDown(
-  TranslationProvider languageProvider,
-  BuildContext context,
-) {
-  return DropdownButton(
-    value: languageProvider.script,
-    iconSize: 20,
-
-    underline: Container(height: 1, color: AppColors().darkBlue),
-    style: TextStyle(
-      fontWeight: FontWeight.w500,
-      fontSize: 17,
-      color: AppColors().darkBlue,
-    ),
-    onChanged: (value) {
-      context.read<TranslationProvider>().setScript(value);
-    },
-    items:
-        TextRecognitionScript.values.map<DropdownMenuItem>((script) {
-          return DropdownMenuItem<TextRecognitionScript>(
-            value: script,
-            child: Text(script.name),
+        TranslateLanguage.values.map<DropdownMenuItem>((lang) {
+          return DropdownMenuItem<String>(
+            value: lang.bcpCode,
+            child: Text(lang.name),
           );
         }).toList(),
   );

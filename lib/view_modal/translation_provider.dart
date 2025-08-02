@@ -21,12 +21,11 @@ class TranslationProvider with ChangeNotifier {
     });
   }
 
-  String _recognizedText = "Recognized Text";
+  String _recognizedText = "";
   String get recognizedText => _recognizedText;
-
   Future<void> translateImage({required String imgPath}) async {
     var recognized = await TextRecognizer(
-      script: _script,
+      script: TextRecognitionScript.latin,
     ).processImage(InputImage.fromFilePath(imgPath));
     _recognizedText = recognized.text;
     notifyListeners();
@@ -70,12 +69,5 @@ class TranslationProvider with ChangeNotifier {
       isSource ? _sourceLanguage = lang : _targetLanguage = lang;
       notifyListeners();
     }
-  }
-
-  TextRecognitionScript _script = TextRecognitionScript.latin;
-  TextRecognitionScript get script => _script;
-  void setScript(TextRecognitionScript scrpt) {
-    _script = scrpt;
-    notifyListeners();
   }
 }

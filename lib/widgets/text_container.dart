@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:translate_now/utils/app_colors.dart';
@@ -48,7 +49,9 @@ class TextContainer extends StatelessWidget {
                   spacing: 15,
                   children: [
                     Text(
-                      "English",
+                      isSource
+                          ? translationProvider.sourceLanguage.name
+                          : translationProvider.targetLanguage.name,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -67,6 +70,11 @@ class TextContainer extends StatelessWidget {
                       isSource
                           ? () {
                             textController!.clear();
+                          }
+                          : isImgRecognizer
+                          ? () {
+                            translationProvider.setImgOutputText("");
+                            translationProvider.setTranslationDone(false);
                           }
                           : () {
                             translationProvider.setOutputText("");
@@ -169,7 +177,13 @@ class TextContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     customIconButton(
-                      onTap: () {},
+                      onTap: () async {
+                        await FlutterClipboard.copy(
+                          isImgRecognizer
+                              ? translationProvider.recognizedText
+                              : translationProvider.outputText,
+                        );
+                      },
                       icon: Icons.copy_rounded,
                       color: AppColors().darkBlue,
                     ),
