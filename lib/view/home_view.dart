@@ -13,7 +13,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final TextEditingController textController = TextEditingController();
+  static final TextEditingController textController = TextEditingController(
+    text: "",
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,13 +24,13 @@ class _HomeViewState extends State<HomeView> {
         child: Center(
           child: Column(
             children: [
-              SizedBox(height: 20),
-              LanguageSelectRow(),
-              SizedBox(height: 30),
+              const SizedBox(height: 20),
+              const LanguageSelectRow(),
+              const SizedBox(height: 30),
               TextContainer(isSource: true, textController: textController),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               context.watch<TranslationProvider>().translationDone
-                  ? TextContainer()
+                  ? const TextContainer()
                   : Container(),
             ],
           ),

@@ -16,9 +16,11 @@ class LanguageSelectRow extends StatelessWidget {
     return Container(
       height: 47,
       width: 320,
+      margin: EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
         color: AppColors().lightPurple,
         borderRadius: BorderRadius.circular(50),
+
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -33,13 +35,12 @@ class LanguageSelectRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Row(
-            spacing: 15,
             children: [
               CircleAvatar(
                 radius: 18,
                 child: CountryFlag.fromLanguageCode(
                   isImg ? "en" : languageProvider.sourceLanguage.bcpCode,
-                  shape: Circle(),
+                  shape: const Circle(),
                 ),
               ),
               isImg
@@ -70,7 +71,7 @@ class LanguageSelectRow extends StatelessWidget {
                 radius: 18,
                 child: CountryFlag.fromLanguageCode(
                   languageProvider.targetLanguage.bcpCode,
-                  shape: Circle(),
+                  shape: const Circle(),
                 ),
               ),
             ],
@@ -103,6 +104,7 @@ Widget _buildDropDown({
     ),
     onChanged: (value) {
       context.read<TranslationProvider>().setLanguage(isSource, value);
+      context.read<TranslationProvider>().setTranslationDone(false);
     },
 
     items:

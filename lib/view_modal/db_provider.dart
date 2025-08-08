@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:translate_now/database/local_dataBase/db_helper.dart';
 
 class DBProvider with ChangeNotifier {
@@ -37,6 +37,21 @@ class DBProvider with ChangeNotifier {
 
   Future<void> deleteData({required int sno, required bool isHistory}) async {
     bool check = await _dbRef.deleteHistory(sno: sno, isHistory: isHistory);
+
+    if (kDebugMode) {
+      print(check);
+    }
+
+    if (check) {
+      isHistory
+          ? _allHistoryData = await _dbRef.getAllData(isHistory: true)
+          : _allFavouriteData = await _dbRef.getAllData(isHistory: false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> clearAllHistory({required bool isHistory}) async {
+    bool check = await _dbRef.deleteAllHistory(isHistory: isHistory);
     if (check) {
       isHistory
           ? _allHistoryData = await _dbRef.getAllData(isHistory: true)

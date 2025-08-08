@@ -18,78 +18,79 @@ class CameraView extends StatefulWidget {
 class _CameraViewState extends State<CameraView> {
   @override
   Widget build(BuildContext context) {
-    final imgPicker = context.read<ImgProvider>();
+    final imgProvider = context.read<ImgProvider>();
     final translationProvider = context.read<TranslationProvider>();
 
     return Scaffold(
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        spacing: 20,
         children: [
           FloatingActionButton(
             onPressed: () {
-              imgPicker.pickImage(source: ImageSource.camera);
+              imgProvider.pickImage(source: ImageSource.camera);
             },
             backgroundColor: AppColors().darkBlue,
-
-            child: Icon(Icons.camera_alt, size: 30),
+            child: const Icon(Icons.camera_alt, size: 30),
           ),
+          const SizedBox(width: 20),
           FloatingActionButton(
-            onPressed: () {
-              imgPicker.pickImage(source: ImageSource.gallery).then((value) {
+            onPressed: () async {
+              await imgProvider.pickImage(source: ImageSource.gallery);
+              if (imgProvider.imagePath.isNotEmpty) {
                 translationProvider.translateImage(
-                  imgPath: imgPicker.imagePath,
+                  imgPath: imgProvider.imagePath,
                 );
-              });
+              }
             },
             backgroundColor: AppColors().darkBlue,
-
-            child: Icon(Icons.image, size: 30),
+            child: const Icon(Icons.image, size: 30),
           ),
         ],
       ),
-      body: Consumer<ImgProvider>(
-        builder: (_, value, _) {
-          return SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: [
-                  SizedBox(height: 10),
-                  LanguageSelectRow(isImg: true),
-                  SizedBox(height: 10),
-                  value.image != null
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              const LanguageSelectRow(isImg: true),
+              const SizedBox(height: 10),
+              Consumer<ImgProvider>(
+                builder: (context, value, _) {
+                  return value.image != null
                       ? Container(
                         height: 300,
                         decoration: BoxDecoration(
-                          color: Colors.yellowAccent,
                           image: DecorationImage(
                             image: FileImage(value.image!),
                             fit: BoxFit.fill,
                           ),
                         ),
                       )
-                      : Icon(Icons.image, size: 200),
-                  SizedBox(height: 10),
-                  TextContainer(
-                    isSource: true,
-                    width: 380,
-                    isImgRecognizer: true,
-                  ),
-                  SizedBox(height: 30),
-                  context.watch<TranslationProvider>().translationDone
-                      ? TextContainer(
+                      : const Icon(Icons.image, size: 200, color: Colors.grey);
+                },
+              ),
+              const SizedBox(height: 10),
+              const TextContainer(
+                isSource: true,
+                width: 380,
+                isImgRecognizer: true,
+              ),
+              const SizedBox(height: 30),
+              Consumer<TranslationProvider>(
+                builder: (context, translationValue, _) {
+                  return translationValue.translationDone
+                      ? const TextContainer(
                         isSource: false,
                         width: 380,
                         isImgRecognizer: true,
                       )
-                      : Container(),
-
-                  SizedBox(height: 100),
-                ],
+                      : Container();
+                },
               ),
-            ),
-          );
-        },
+              const SizedBox(height: 100),
+            ],
+          ),
+        ),
       ),
     );
   }

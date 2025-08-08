@@ -6,11 +6,10 @@ import 'package:translate_now/view/favourite_view.dart';
 import 'package:translate_now/view/history_view.dart';
 import 'package:translate_now/view/home_view.dart';
 import 'package:translate_now/view_modal/bottom_app_bar_provider.dart';
-import 'package:translate_now/widgets/custom_icon_button.dart';
+import 'package:translate_now/view_modal/db_provider.dart';
 
 import '../view/camera_view.dart';
 import '../view/chat_view.dart';
-import '../view_modal/image_provider.dart';
 
 class CustomBottomBar extends StatefulWidget {
   const CustomBottomBar({super.key});
@@ -20,91 +19,84 @@ class CustomBottomBar extends StatefulWidget {
 }
 
 class _CustomBottomBarState extends State<CustomBottomBar> {
-  final List<TabItem> _tabItems = [
+  final List<TabItem> _tabItems = const [
     TabItem(icon: Icons.mic, title: 'Chat'),
     TabItem(icon: Icons.camera_alt, title: 'Camera'),
     TabItem(icon: Icons.translate, title: 'Home'),
     TabItem(icon: Icons.history, title: 'History'),
     TabItem(icon: Icons.star_border, title: 'Favourite'),
   ];
-  List screens = [
+
+  final List<Widget> _screens = const [
     ChatView(),
     CameraView(),
     HomeView(),
     HistoryView(),
     FavouriteView(),
   ];
-  List<String> title = [
+
+  final List<String> _titles = const [
     "Voice Conversation",
-    "Camera Traslation",
+    "Camera Translation",
     "Language Translator",
     "History",
     "Favourite",
   ];
+
   @override
   Widget build(BuildContext context) {
     final indexProvider = context.watch<BottomAppBarProvider>();
-    final imgPicker = context.read<ImgProvider>();
+    final dbProvider = context.read<DBProvider>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors().darkBlue,
-        automaticallyImplyLeading: false,
-        title: Text(title[indexProvider.index]),
-        titleTextStyle: TextStyle(
+        title: Text(_titles[indexProvider.index]),
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        leading: DrawerButton(
-          color: Colors.white,
-          style: ButtonStyle(iconSize: WidgetStatePropertyAll(28)),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            );
+          },
         ),
         actions: [
-          indexProvider.index == 3
-              ? !indexProvider.isSelected
-                  ? TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Clear all",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  )
-                  : Row(
-                    spacing: 15,
-                    children: [
-                      customIconButton(
-                        onTap: () {},
-                        icon: Icons.check_box_outline_blank,
-                      ),
-                      customIconButton(
-                        onTap: () {},
-                        icon: Icons.delete_forever,
-                      ),
-                    ],
-                  )
-              : SizedBox(),
+          if (indexProvider.index == 3 || indexProvider.index == 4)
+            TextButton(
+              onPressed: () {
+                dbProvider.clearAllHistory(isHistory: indexProvider.index == 3);
+              },
+              child: const Text(
+                "Clear all",
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
         ],
-        actionsPadding: EdgeInsets.only(right: 20),
+        actionsPadding: const EdgeInsets.only(right: 20),
       ),
-      drawer: Container(
+      drawer: Drawer(
         width: 308,
-        color: Colors.white,
         child: Column(
           children: [
-            SizedBox(height: 90),
+            const SizedBox(height: 90),
             Image.asset("assets/logo.png", width: 100, height: 82),
-            SizedBox(height: 25),
-            Text(
+            const SizedBox(height: 25),
+            const Text(
               "TRANSLATE ON THE GO",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 100),
-            reUseRow(Icons.share, "Share App"),
-            reUseRow(Icons.star, "Rate Us"),
-            reUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
-            reUseRow(Icons.feed, "Feedback"),
-            Spacer(),
-            Text(
+            const SizedBox(height: 100),
+            _buildReUseRow(Icons.share, "Share App"),
+            _buildReUseRow(Icons.star, "Rate Us"),
+            _buildReUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
+            _buildReUseRow(Icons.feed, "Feedback"),
+            const Spacer(),
+            const Text(
               "Version 1.0",
               style: TextStyle(
                 fontSize: 14,
@@ -112,7 +104,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -121,7 +113,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
         color: Colors.black,
         height: 60,
         backgroundColor: AppColors().lightPurple,
-        activeColor: Color.fromRGBO(0, 91, 161, 1),
+        activeColor: const Color.fromRGBO(0, 91, 161, 1),
         elevation: 7,
         shadowColor: Colors.black38,
         curveSize: 100,
@@ -131,24 +123,23 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           context.read<BottomAppBarProvider>().setIndex(idx: index);
         },
       ),
-
-      body: screens[indexProvider.index],
+      body: _screens[indexProvider.index],
     );
   }
 }
 
-Widget reUseRow(IconData drawerIcon, String iconLabel) {
+Widget _buildReUseRow(IconData drawerIcon, String iconLabel) {
   return SizedBox(
     width: 180,
     height: 60,
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      spacing: 29,
       children: [
         Icon(drawerIcon, size: 24),
+        const SizedBox(width: 29), // Replaced spacing with SizedBox
         Text(
           iconLabel,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
       ],
     ),

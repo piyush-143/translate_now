@@ -45,6 +45,13 @@ class TranslationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _addedToFav = false;
+  bool get addedToFav => _addedToFav;
+  void setAddedToFav(bool isAdded) {
+    _addedToFav = isAdded;
+    notifyListeners();
+  }
+
   String _outputText = '';
   String get outputText => _outputText;
   void setOutputText(String text) {

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:translate_now/view/splash_view.dart';
 import 'package:translate_now/view_modal/bottom_app_bar_provider.dart';
+import 'package:translate_now/view_modal/db_provider.dart';
 import 'package:translate_now/view_modal/image_provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
 
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => BottomAppBarProvider()),
         ChangeNotifierProvider(create: (context) => TranslationProvider()),
         ChangeNotifierProvider(create: (context) => ImgProvider()),
+        ChangeNotifierProvider(create: (context) => DBProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
         ),
 
         debugShowCheckedModeBanner: false,
-        home: SplashView(),
+        home: const SplashView(),
       ),
     );
   }

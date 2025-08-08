@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:translate_now/widgets/custom_bottom_bar.dart';
+
+import '../view_modal/db_provider.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -20,6 +23,12 @@ class _SplashViewState extends State<SplashView> {
       );
     });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<DBProvider>().getData();
   }
 
   @override

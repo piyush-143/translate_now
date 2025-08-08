@@ -1,7 +1,10 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:translate_now/utils/app_colors.dart';
+import 'package:translate_now/view_modal/db_provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
 import 'package:translate_now/widgets/custom_icon_button.dart';
 
@@ -21,13 +24,16 @@ class TextContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final translationProvider = context.read<TranslationProvider>();
+    final dbProvider = context.read<DBProvider>();
+    final appColors = AppColors();
+
     return Container(
       width: width,
       height: 246,
       decoration: BoxDecoration(
-        color: AppColors().lightPurple,
+        color: appColors.lightPurple,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurStyle: BlurStyle.solid,
@@ -38,7 +44,7 @@ class TextContainer extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -46,7 +52,6 @@ class TextContainer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  spacing: 15,
                   children: [
                     Text(
                       isSource
@@ -55,33 +60,36 @@ class TextContainer extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors().darkBlue,
+                        color: appColors.darkBlue,
                       ),
                     ),
-                    customIconButton(
-                      onTap: () {},
-                      icon: Icons.volume_up_outlined,
-                      color: AppColors().darkBlue,
-                    ),
+                    const SizedBox(width: 15),
+                    // customIconButton(
+                    //   onTap: () {},
+                    //   icon: Icons.volume_up_outlined,
+                    //   color: appColors.darkBlue,
+                    // ),
                   ],
                 ),
                 customIconButton(
                   onTap:
                       isSource
                           ? () {
-                            textController!.clear();
+                            textController?.clear();
+                            translationProvider.setAddedToFav(false);
                           }
                           : isImgRecognizer
                           ? () {
                             translationProvider.setImgOutputText("");
                             translationProvider.setTranslationDone(false);
+                            translationProvider.setAddedToFav(false);
                           }
                           : () {
                             translationProvider.setOutputText("");
                             translationProvider.setTranslationDone(false);
                           },
                   icon: Icons.cancel_outlined,
-                  color: AppColors().darkBlue,
+                  color: appColors.darkBlue,
                 ),
               ],
             ),
@@ -95,21 +103,26 @@ class TextContainer extends StatelessWidget {
                           softWrap: true,
                           maxLines: 8,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 15, height: 1.1),
+                          style: const TextStyle(fontSize: 15, height: 1.1),
                         ),
                       ),
                     )
-                    : TextFormField(
-                      controller: textController,
-                      keyboardType: TextInputType.text,
-                      maxLines: 7,
-                      style: TextStyle(fontSize: 14, height: 1.2),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
+                    : Expanded(
+                      child: TextFormField(
+                        controller: textController,
+                        keyboardType: TextInputType.text,
+                        maxLines: 7,
+                        style: const TextStyle(fontSize: 14, height: 1.2),
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: "Enter text here...",
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
-                        hintText: "Enter text here...",
-                        hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     )
                 : Expanded(
@@ -122,83 +135,130 @@ class TextContainer extends StatelessWidget {
                       softWrap: true,
                       maxLines: 8,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 15, height: 1.1),
+                      style: const TextStyle(fontSize: 15, height: 1.1),
                     ),
                   ),
                 ),
-
-            isSource
-                ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    isImgRecognizer
-                        ? Text("")
-                        : InkWell(
-                          onTap: () {},
-                          child: CircleAvatar(
-                            radius: 22,
-                            backgroundColor: AppColors().darkBlue,
-                            child: Icon(Icons.mic, size: 28),
-                          ),
-                        ),
-                    InkWell(
-                      onTap: () {
-                        translationProvider.translateText(
-                          input:
-                              isImgRecognizer
-                                  ? translationProvider.recognizedText
-                                  : textController!.text.toString(),
-                          isImgRecognizer: isImgRecognizer,
-                        );
-                      },
-                      child: Container(
-                        width: 108,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: AppColors().darkOrange,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Translate",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
+            if (isSource)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      final input =
+                          isImgRecognizer
+                              ? translationProvider.recognizedText
+                              : textController?.text.toString() ?? '';
+                      if (input.isNotEmpty) {
+                        translationProvider
+                            .translateText(
+                              input: input,
+                              isImgRecognizer: isImgRecognizer,
+                            )
+                            .whenComplete(() {
+                              dbProvider.addData(
+                                isHistory: true,
+                                sourceLang:
+                                    isImgRecognizer
+                                        ? "en"
+                                        : translationProvider
+                                            .sourceLanguage
+                                            .bcpCode,
+                                targetLang:
+                                    translationProvider.targetLanguage.bcpCode,
+                                sourceText: input,
+                                targetText:
+                                    isImgRecognizer
+                                        ? translationProvider.imgOutputText
+                                            .toString()
+                                        : translationProvider.outputText
+                                            .toString(),
+                              );
+                            });
+                        translationProvider.setAddedToFav(false);
+                      }
+                    },
+                    child: Container(
+                      width: 108,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: appColors.darkOrange,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Translate",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                )
-                : Row(
-                  spacing: 20,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    customIconButton(
-                      onTap: () async {
-                        await FlutterClipboard.copy(
+                  ),
+                ],
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  customIconButton(
+                    onTap: () async {
+                      await FlutterClipboard.copy(
+                        isImgRecognizer
+                            ? translationProvider.imgOutputText
+                            : translationProvider.outputText,
+                      );
+                    },
+                    icon: Icons.copy_rounded,
+                    color: appColors.darkBlue,
+                  ),
+                  const SizedBox(width: 20),
+                  customIconButton(
+                    onTap: () async {
+                      final textToShare =
                           isImgRecognizer
-                              ? translationProvider.recognizedText
-                              : translationProvider.outputText,
+                              ? translationProvider.imgOutputText
+                              : translationProvider.outputText;
+                      if (textToShare.isNotEmpty) {
+                        await SharePlus.instance.share(
+                          ShareParams(text: textToShare),
                         );
-                      },
-                      icon: Icons.copy_rounded,
-                      color: AppColors().darkBlue,
-                    ),
-                    customIconButton(
-                      onTap: () {},
-                      icon: Icons.share,
-                      color: AppColors().darkBlue,
-                    ),
-                    customIconButton(
-                      onTap: () {},
-                      icon: Icons.star_border,
-                      color: AppColors().darkBlue,
-                    ),
-                  ],
-                ),
+                      }
+                    },
+                    icon: Icons.share,
+                    color: appColors.darkBlue,
+                  ),
+                  const SizedBox(width: 20),
+                  customIconButton(
+                    onTap: () {
+                      dbProvider.addData(
+                        isHistory: false,
+                        sourceLang:
+                            isImgRecognizer
+                                ? "en"
+                                : translationProvider.sourceLanguage.bcpCode,
+                        targetLang: translationProvider.targetLanguage.bcpCode,
+                        sourceText:
+                            isImgRecognizer
+                                ? translationProvider.recognizedText
+                                : textController?.text.toString() ?? '',
+                        targetText:
+                            isImgRecognizer
+                                ? translationProvider.imgOutputText.toString()
+                                : translationProvider.outputText.toString(),
+                      );
+                      translationProvider.setAddedToFav(true);
+                    },
+                    icon:
+                        context.watch<TranslationProvider>().addedToFav
+                            ? Icons.star
+                            : Icons.star_border,
+                    color: appColors.darkBlue,
+                  ),
+                ],
+              ),
           ],
         ),
       ),
