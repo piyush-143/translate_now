@@ -80,13 +80,23 @@ class DBHelper {
             ? await db.delete(
               historyTableName,
               where: "$hSno=?",
-              whereArgs: ["$sno"],
+              whereArgs: [sno],
             )
             : await db.delete(
               favouriteTableName,
               where: "$fSno=?",
-              whereArgs: ["$sno"],
+              whereArgs: [sno],
             );
+
+    return rowEffected > 0;
+  }
+
+  Future<bool> deleteAllHistory({required bool isHistory}) async {
+    var db = await getDb();
+    int rowEffected =
+        isHistory
+            ? await db.rawDelete("DELETE FROM $historyTableName")
+            : await db.rawDelete("DELETE FROM $favouriteTableName");
     return rowEffected > 0;
   }
 
@@ -96,8 +106,8 @@ class DBHelper {
     var db = await getDb();
     List<Map<String, dynamic>> data =
         isHistory
-            ? await db.query(historyTableName)
-            : await db.query(favouriteTableName);
+            ? await db.query(historyTableName, orderBy: "$hSno DESC")
+            : await db.query(favouriteTableName, orderBy: "$fSno DESC");
     return data;
   }
 }

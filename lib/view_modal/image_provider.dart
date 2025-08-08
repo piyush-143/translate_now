@@ -11,8 +11,10 @@ class ImgProvider with ChangeNotifier {
   Future<void> pickImage({required ImageSource source}) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: source);
-    _imagePath = image!.path;
-    _image = File(_imagePath);
-    notifyListeners();
+    if (image != null) {
+      _imagePath = image.path;
+      _image = File(_imagePath);
+      notifyListeners();
+    }
   }
 }
