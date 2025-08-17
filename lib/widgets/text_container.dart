@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:translate_now/utils/app_colors.dart';
 import 'package:translate_now/view_modal/db_provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
-import 'package:translate_now/widgets/custom_icon_button.dart';
+import 'package:translate_now/widgets/custom_buttons.dart';
 
 class TextContainer extends StatelessWidget {
   final bool isSource;
@@ -64,14 +64,9 @@ class TextContainer extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 15),
-                    // customIconButton(
-                    //   onTap: () {},
-                    //   icon: Icons.volume_up_outlined,
-                    //   color: appColors.darkBlue,
-                    // ),
                   ],
                 ),
-                customIconButton(
+                CustomButtons().customIconButton(
                   onTap:
                       isSource
                           ? () {
@@ -203,7 +198,7 @@ class TextContainer extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  customIconButton(
+                  CustomButtons().customIconButton(
                     onTap: () async {
                       await FlutterClipboard.copy(
                         isImgRecognizer
@@ -215,7 +210,7 @@ class TextContainer extends StatelessWidget {
                     color: appColors.darkBlue,
                   ),
                   const SizedBox(width: 20),
-                  customIconButton(
+                  CustomButtons().customIconButton(
                     onTap: () async {
                       final textToShare =
                           isImgRecognizer
@@ -231,7 +226,7 @@ class TextContainer extends StatelessWidget {
                     color: appColors.darkBlue,
                   ),
                   const SizedBox(width: 20),
-                  customIconButton(
+                  CustomButtons().customIconButton(
                     onTap: () {
                       dbProvider.addData(
                         isHistory: false,
@@ -243,7 +238,7 @@ class TextContainer extends StatelessWidget {
                         sourceText:
                             isImgRecognizer
                                 ? translationProvider.recognizedText
-                                : textController?.text.toString() ?? '',
+                                : textController?.text.toString() ?? "null",
                         targetText:
                             isImgRecognizer
                                 ? translationProvider.imgOutputText.toString()

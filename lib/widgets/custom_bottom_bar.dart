@@ -7,6 +7,7 @@ import 'package:translate_now/view/history_view.dart';
 import 'package:translate_now/view/home_view.dart';
 import 'package:translate_now/view_modal/bottom_app_bar_provider.dart';
 import 'package:translate_now/view_modal/db_provider.dart';
+import 'package:translate_now/widgets/custom_dialog.dart';
 
 import '../view/camera_view.dart';
 import '../view/chat_view.dart';
@@ -48,82 +49,89 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     final indexProvider = context.watch<BottomAppBarProvider>();
     final dbProvider = context.read<DBProvider>();
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors().darkBlue,
-        title: Text(_titles[indexProvider.index]),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        return CustomDialog().exitDialog(context);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors().darkBlue,
+          title: Text(_titles[indexProvider.index]),
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              );
+            },
+          ),
+          actions: [
+            if (indexProvider.index == 3 || indexProvider.index == 4)
+              TextButton(
+                onPressed: () {
+                  dbProvider.clearAllHistory(
+                    isHistory: indexProvider.index == 3,
+                  );
+                },
+                child: const Text(
+                  "Clear all",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+          ],
+          actionsPadding: const EdgeInsets.only(right: 20),
         ),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            );
+        drawer: Drawer(
+          width: 308,
+          child: Column(
+            children: [
+              const SizedBox(height: 90),
+              Image.asset("assets/logo.png", width: 100, height: 82),
+              const SizedBox(height: 25),
+              const Text(
+                "TRANSLATE ON THE GO",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 100),
+              _buildReUseRow(Icons.share, "Share App"),
+              _buildReUseRow(Icons.star, "Rate Us"),
+              _buildReUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
+              _buildReUseRow(Icons.feed, "Feedback"),
+              const Spacer(),
+              const Text(
+                "Version 1.0",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+        bottomNavigationBar: ConvexAppBar(
+          items: _tabItems,
+          color: Colors.black,
+          height: 60,
+          backgroundColor: AppColors().lightPurple,
+          activeColor: const Color.fromRGBO(0, 91, 161, 1),
+          elevation: 7,
+          shadowColor: Colors.black38,
+          curveSize: 100,
+          top: -16,
+          initialActiveIndex: indexProvider.index,
+          onTap: (index) {
+            context.read<BottomAppBarProvider>().setIndex(idx: index);
           },
         ),
-        actions: [
-          if (indexProvider.index == 3 || indexProvider.index == 4)
-            TextButton(
-              onPressed: () {
-                dbProvider.clearAllHistory(isHistory: indexProvider.index == 3);
-              },
-              child: const Text(
-                "Clear all",
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-            ),
-        ],
-        actionsPadding: const EdgeInsets.only(right: 20),
+        body: _screens[indexProvider.index],
       ),
-      drawer: Drawer(
-        width: 308,
-        child: Column(
-          children: [
-            const SizedBox(height: 90),
-            Image.asset("assets/logo.png", width: 100, height: 82),
-            const SizedBox(height: 25),
-            const Text(
-              "TRANSLATE ON THE GO",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 100),
-            _buildReUseRow(Icons.share, "Share App"),
-            _buildReUseRow(Icons.star, "Rate Us"),
-            _buildReUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
-            _buildReUseRow(Icons.feed, "Feedback"),
-            const Spacer(),
-            const Text(
-              "Version 1.0",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
-      bottomNavigationBar: ConvexAppBar(
-        items: _tabItems,
-        color: Colors.black,
-        height: 60,
-        backgroundColor: AppColors().lightPurple,
-        activeColor: const Color.fromRGBO(0, 91, 161, 1),
-        elevation: 7,
-        shadowColor: Colors.black38,
-        curveSize: 100,
-        top: -16,
-        initialActiveIndex: indexProvider.index,
-        onTap: (index) {
-          context.read<BottomAppBarProvider>().setIndex(idx: index);
-        },
-      ),
-      body: _screens[indexProvider.index],
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:translate_now/view_modal/db_provider.dart';
-import 'package:translate_now/widgets/custom_icon_button.dart';
+import 'package:translate_now/widgets/custom_buttons.dart';
 
 import '../utils/app_colors.dart';
 
@@ -100,14 +100,14 @@ Widget _buildReUseRow({
       ),
       isSource
           ? isFav
-              ? customIconButton(
+              ? CustomButtons().customIconButton(
                 onTap: () {
                   db.deleteData(sno: sno, isHistory: false);
                 },
                 icon: Icons.star,
                 color: AppColors().darkBlue,
               )
-              : customIconButton(
+              : CustomButtons().customIconButton(
                 onTap: () {
                   db.deleteData(sno: sno, isHistory: true);
                 },

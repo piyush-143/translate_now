@@ -13,9 +13,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  static final TextEditingController textController = TextEditingController(
-    text: "",
-  );
+  static final TextEditingController textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

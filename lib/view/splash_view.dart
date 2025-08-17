@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:translate_now/view_modal/speech_to_text_provider.dart';
 import 'package:translate_now/widgets/custom_bottom_bar.dart';
 
 import '../view_modal/db_provider.dart';
@@ -22,6 +23,7 @@ class _SplashViewState extends State<SplashView> {
         MaterialPageRoute(builder: (context) => CustomBottomBar()),
       );
     });
+    context.read<SpeechToTextProvider>().initSpeech();
     super.initState();
   }
 

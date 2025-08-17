@@ -6,6 +6,7 @@ class TranslationProvider with ChangeNotifier {
   Future<void> translateText({
     required String input,
     bool isImgRecognizer = false,
+    bool isChat = false,
   }) async {
     setLoading(true);
     final onDeviceTranslator = OnDeviceTranslator(
@@ -16,7 +17,11 @@ class TranslationProvider with ChangeNotifier {
     await onDeviceTranslator.translateText(input).then((value) {
       setLoading(false);
       setTranslationDone(true);
-      isImgRecognizer ? _imgOutputText = value : _outputText = value;
+      isChat
+          ? _chatOutputText = value
+          : isImgRecognizer
+          ? _imgOutputText = value
+          : _outputText = value;
       notifyListeners();
     });
   }
@@ -56,6 +61,13 @@ class TranslationProvider with ChangeNotifier {
   String get outputText => _outputText;
   void setOutputText(String text) {
     _outputText = text;
+    notifyListeners();
+  }
+
+  String _chatOutputText = '';
+  String get chatOutputText => _chatOutputText;
+  void setChatOutputText(String text) {
+    _chatOutputText = text;
     notifyListeners();
   }
 
