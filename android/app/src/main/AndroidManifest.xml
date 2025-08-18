@@ -19,7 +19,7 @@
     </queries>
 
     <application
-        android:label="translate_now"
+        android:label="Translate Now"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

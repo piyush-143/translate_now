@@ -26,8 +26,13 @@ class _CameraViewState extends State<CameraView> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () {
-              imgProvider.pickImage(source: ImageSource.camera);
+            onPressed: () async {
+              await imgProvider.pickImage(source: ImageSource.camera);
+              if (imgProvider.imagePath.isNotEmpty) {
+                translationProvider.translateImage(
+                  imgPath: imgProvider.imagePath,
+                );
+              }
             },
             backgroundColor: AppColors().darkBlue,
             child: const Icon(Icons.camera_alt, size: 30),
