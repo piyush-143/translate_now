@@ -13,7 +13,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  static final TextEditingController textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,10 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 20),
               const LanguageSelectRow(),
               const SizedBox(height: 30),
-              TextContainer(isSource: true, textController: textController),
+              TextContainer(isSource: true, textController: _textController),
               const SizedBox(height: 30),
               context.watch<TranslationProvider>().translationDone
-                  ? const TextContainer()
+                  ? TextContainer(textController: _textController)
                   : Container(),
             ],
           ),

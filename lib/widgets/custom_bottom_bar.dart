@@ -130,7 +130,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
             context.read<BottomAppBarProvider>().setIndex(idx: index);
           },
         ),
-        body: _screens[indexProvider.index],
+        body: IndexedStack(index: indexProvider.index, children: _screens),
       ),
     );
   }

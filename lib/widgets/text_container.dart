@@ -70,7 +70,7 @@ class TextContainer extends StatelessWidget {
                   onTap:
                       isSource
                           ? () {
-                            textController?.clear();
+                            textController!.clear();
                             translationProvider.setAddedToFav(false);
                           }
                           : isImgRecognizer
@@ -238,7 +238,7 @@ class TextContainer extends StatelessWidget {
                         sourceText:
                             isImgRecognizer
                                 ? translationProvider.recognizedText
-                                : textController?.text.toString() ?? "null",
+                                : textController!.text.toString(),
                         targetText:
                             isImgRecognizer
                                 ? translationProvider.imgOutputText.toString()
