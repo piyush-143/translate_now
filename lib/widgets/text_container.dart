@@ -86,6 +86,11 @@ class TextContainer extends StatelessWidget {
                                 translationProvider.setTranslationDone(false);
                                 translationProvider.setAddedToFav(false);
                               }
+
+                          ? () {
+                            textController!.clear();
+                            translationProvider.setAddedToFav(false);
+                          }
                           : isImgRecognizer
                           ? () {
                             translationProvider.resetImgOutputText();
