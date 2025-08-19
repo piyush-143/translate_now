@@ -90,7 +90,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           width: 308,
           child: Column(
             children: [
-              const SizedBox(height: 90),
+              const SizedBox(height: 130),
               Image.asset("assets/logo.png", width: 100, height: 82),
               const SizedBox(height: 25),
               const Text(
@@ -111,7 +111,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
             ],
           ),
         ),

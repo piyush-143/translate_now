@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
@@ -8,45 +8,46 @@ class TranslationProvider with ChangeNotifier {
     bool isImgRecognizer = false,
     bool isChat = false,
   }) async {
-    setLoading(true);
     final onDeviceTranslator = OnDeviceTranslator(
       sourceLanguage: sourceLanguage,
       targetLanguage: targetLanguage,
     );
-    await Future.delayed(Duration(seconds: 1));
-    await onDeviceTranslator.translateText(input).then((value) {
-      setLoading(false);
+
+    try {
+      final translatedValue = await onDeviceTranslator.translateText(input);
+      if (isChat) {
+        _chatOutputText = translatedValue;
+      } else if (isImgRecognizer) {
+        _imgOutputText = translatedValue;
+      } else {
+        _outputText = translatedValue;
+      }
       setTranslationDone(true);
-      isChat
-          ? _chatOutputText = value
-          : isImgRecognizer
-          ? _imgOutputText = value
-          : _outputText = value;
-      notifyListeners();
-    });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Translation error: $e');
+      }
+    }
   }
 
   String _recognizedText = "";
   String get recognizedText => _recognizedText;
   Future<void> translateImage({required String imgPath}) async {
-    var recognized = await TextRecognizer(
-      script: TextRecognitionScript.latin,
-    ).processImage(InputImage.fromFilePath(imgPath));
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final inputImage = InputImage.fromFilePath(imgPath);
+    final recognized = await textRecognizer.processImage(inputImage);
     _recognizedText = recognized.text;
     notifyListeners();
+  }
+
+  void resetRecognized() {
+    _recognizedText = "";
   }
 
   bool _translationDone = false;
   bool get translationDone => _translationDone;
   void setTranslationDone(bool isDone) {
     _translationDone = isDone;
-    notifyListeners();
-  }
-
-  bool _loading = false;
-  bool get loading => _loading;
-  void setLoading(bool load) {
-    _loading = load;
     notifyListeners();
   }
 
@@ -59,8 +60,8 @@ class TranslationProvider with ChangeNotifier {
 
   String _outputText = '';
   String get outputText => _outputText;
-  void setOutputText(String text) {
-    _outputText = text;
+  void resetOutputText() {
+    _outputText = "";
     notifyListeners();
   }
 
@@ -73,8 +74,8 @@ class TranslationProvider with ChangeNotifier {
 
   String _imgOutputText = '';
   String get imgOutputText => _imgOutputText;
-  void setImgOutputText(String text) {
-    _imgOutputText = text;
+  void resetImgOutputText() {
+    _imgOutputText = "";
     notifyListeners();
   }
 
@@ -82,8 +83,9 @@ class TranslationProvider with ChangeNotifier {
   TranslateLanguage get targetLanguage => _targetLanguage;
   TranslateLanguage _sourceLanguage = TranslateLanguage.english;
   TranslateLanguage get sourceLanguage => _sourceLanguage;
+
   void setLanguage(bool isSource, String code) {
-    final lang = BCP47Code.fromRawValue(code);
+    final lang = BCP47Code.fromRawValue(code); // Fixed this line
     if (lang != null) {
       isSource ? _sourceLanguage = lang : _targetLanguage = lang;
       notifyListeners();
