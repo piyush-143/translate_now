@@ -2,11 +2,11 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:provider/provider.dart';
-import 'package:translate_now/view_modal/speech_to_text_provider.dart';
-import 'package:translate_now/view_modal/translation_provider.dart';
+import 'package:translate_now/utils/app_colors.dart';
 import 'package:translate_now/widgets/custom_buttons.dart';
 
-import '../utils/app_colors.dart';
+import '../view_modal/speech_to_text_provider.dart';
+import '../view_modal/translation_provider.dart';
 
 class LanguageSelectRow extends StatelessWidget {
   final bool isImg;
@@ -16,17 +16,16 @@ class LanguageSelectRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageProvider = context.watch<TranslationProvider>();
-    final speechToTextProvider = context.read<SpeechToTextProvider>();
-    final speechToTextProviderW = context.watch<SpeechToTextProvider>();
+    final speechToTextProvider = context.watch<SpeechToTextProvider>();
+
     return Container(
       height: 47,
       width: 320,
-      margin: EdgeInsets.symmetric(horizontal: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
         color: AppColors().lightPurple,
         borderRadius: BorderRadius.circular(50),
-
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurStyle: BlurStyle.solid,
@@ -43,31 +42,31 @@ class LanguageSelectRow extends StatelessWidget {
             children: [
               isChat
                   ? CustomButtons().customMicButton(
-                    onTap: () {
-                      speechToTextProvider.leftSpeechToText.isNotListening
-                          ? speechToTextProvider.startListening()
-                          : speechToTextProvider.stopListening();
-                      context
-                          .read<TranslationProvider>()
-                          .translateText(
-                            input: speechToTextProvider.lastWord,
-                            isChat: true,
-                          )
-                          .then((value) {
-                            speechToTextProvider.addConversation({
-                              "isLeft": true,
-                              "source": speechToTextProviderW.lastWord,
-                              "target": languageProvider.chatOutputText,
-                            });
+                    onTap: () async {
+                      final sttProvider = context.read<SpeechToTextProvider>();
+                      if (sttProvider.leftSpeechToText.isNotListening) {
+                        await sttProvider.startListening();
+                      } else {
+                        await sttProvider.stopListening();
+                        if (sttProvider.lastLeftWord.isNotEmpty) {
+                          await context
+                              .read<TranslationProvider>()
+                              .translateText(
+                                input: sttProvider.lastLeftWord,
+                                isChat: true,
+                              );
+                          sttProvider.addConversation({
+                            "isLeft": true,
+                            "source": sttProvider.lastLeftWord,
+                            "target": languageProvider.chatOutputText,
                           });
+                        }
+                      }
                     },
                     icon:
-                        context
-                                .watch<SpeechToTextProvider>()
-                                .leftSpeechToText
-                                .isNotListening
-                            ? Icons.mic_off
-                            : Icons.mic,
+                        speechToTextProvider.isLeftMicActive
+                            ? Icons.mic
+                            : Icons.mic_off,
                     color: AppColors().darkBlue,
                   )
                   : CircleAvatar(
@@ -106,31 +105,31 @@ class LanguageSelectRow extends StatelessWidget {
               ),
               isChat
                   ? CustomButtons().customMicButton(
-                    onTap: () {
-                      speechToTextProvider.rightSpeechToText.isNotListening
-                          ? speechToTextProvider.startListening(isLeft: false)
-                          : speechToTextProvider.stopListening(isLeft: false);
-                      context
-                          .read<TranslationProvider>()
-                          .translateText(
-                            input: speechToTextProvider.lastWord,
-                            isChat: true,
-                          )
-                          .whenComplete(() {
-                            speechToTextProvider.addConversation({
-                              "isLeft": false,
-                              "source": speechToTextProvider.lastWord,
-                              "target": languageProvider.chatOutputText,
-                            });
+                    onTap: () async {
+                      final sttProvider = context.read<SpeechToTextProvider>();
+                      if (sttProvider.rightSpeechToText.isNotListening) {
+                        await sttProvider.startListening(isLeft: false);
+                      } else {
+                        await sttProvider.stopListening(isLeft: false);
+                        if (sttProvider.lastRightWord.isNotEmpty) {
+                          await context
+                              .read<TranslationProvider>()
+                              .translateText(
+                                input: sttProvider.lastRightWord,
+                                isChat: true,
+                              );
+                          sttProvider.addConversation({
+                            "isLeft": false,
+                            "source": sttProvider.lastRightWord,
+                            "target": languageProvider.chatOutputText,
                           });
+                        }
+                      }
                     },
                     icon:
-                        context
-                                .watch<SpeechToTextProvider>()
-                                .rightSpeechToText
-                                .isNotListening
-                            ? Icons.mic_off
-                            : Icons.mic,
+                        speechToTextProvider.isRightMicActive
+                            ? Icons.mic
+                            : Icons.mic_off,
                     color: AppColors().darkOrange,
                   )
                   : CircleAvatar(
@@ -153,7 +152,7 @@ Widget _buildDropDown({
   required TranslationProvider languageProvider,
   required BuildContext context,
 }) {
-  return DropdownButton(
+  return DropdownButton<String>(
     value:
         (isSource
                 ? languageProvider.sourceLanguage
@@ -168,13 +167,14 @@ Widget _buildDropDown({
       fontSize: 17,
       color: AppColors().darkBlue,
     ),
-    onChanged: (value) {
-      context.read<TranslationProvider>().setLanguage(isSource, value);
-      context.read<TranslationProvider>().setTranslationDone(false);
+    onChanged: (String? value) {
+      if (value != null) {
+        context.read<TranslationProvider>().setLanguage(isSource, value);
+        context.read<TranslationProvider>().setTranslationDone(false);
+      }
     },
-
     items:
-        TranslateLanguage.values.map<DropdownMenuItem>((lang) {
+        TranslateLanguage.values.map<DropdownMenuItem<String>>((lang) {
           return DropdownMenuItem<String>(
             value: lang.bcpCode,
             child: Text(lang.name),

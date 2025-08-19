@@ -17,4 +17,10 @@ class ImgProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void resetImg() {
+    _image = null;
+    _imagePath = "";
+    notifyListeners();
+  }
 }

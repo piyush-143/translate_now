@@ -113,11 +113,27 @@ class CustomDialog {
       margin: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       duration: Duration(seconds: 2),
       icon: Icon(Icons.info_outline_rounded, color: AppColors().darkOrange),
-      messageSize: 15,
+      messageSize: 18,
       backgroundColor: Colors.black54,
       shouldIconPulse: false,
       borderRadius: BorderRadius.circular(5),
       leftBarIndicatorColor: AppColors().darkOrange,
+      messageColor: Colors.white,
     ).show(context);
+  }
+
+  Future progressLoading(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Center(
+          child: CircularProgressIndicator(
+            color: AppColors().darkBlue,
+            backgroundColor: AppColors().lightPurple,
+          ),
+        );
+      },
+    );
   }
 }

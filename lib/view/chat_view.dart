@@ -15,10 +15,7 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) {
-    final speechToTextProvider = context.watch<SpeechToTextProvider>();
     final heightFactor = MediaQuery.of(context).size.height;
-    final widthFactor = MediaQuery.of(context).size.width;
-    bool isSource = true;
     return Scaffold(
       body: Stack(
         children: [
