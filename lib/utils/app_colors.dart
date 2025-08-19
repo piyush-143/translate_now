@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 class AppColors {
-  final Color darkBlue = const Color(0xff003366);
-  final Color darkOrange = const Color(0xffFF6600);
-  final Color white = const Color(0xffFFFFFF);
-  final Color lightPurple = const Color(0xfff7f2fa);
-  final List<Color> linear = const [Color(0xff005BFF), Color(0xff003366)];
+  const AppColors._();
+
+  static const Color darkBlue = Color(0xff003366);
+  static const Color darkOrange = Color(0xffFF6600);
+  static const Color lightPurple = Color(0xfff7f2fa);
 }

@@ -24,7 +24,7 @@ class SpeechToTextProvider with ChangeNotifier {
   String get lastRightWord => _lastRightWord;
 
   List<Map<String, dynamic>> _chatList = [];
-  List<Map<String, dynamic>> get conversationList => _chatList;
+  List<Map<String, dynamic>> get chatList => _chatList;
 
   Future<void> initSpeech() async {
     leftSpeechEnabled = await _leftSpeechToText.initialize();

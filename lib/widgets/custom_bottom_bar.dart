@@ -12,14 +12,9 @@ import 'package:translate_now/widgets/custom_dialog.dart';
 import '../view/camera_view.dart';
 import '../view/chat_view.dart';
 
-class CustomBottomBar extends StatefulWidget {
+class CustomBottomBar extends StatelessWidget {
   const CustomBottomBar({super.key});
 
-  @override
-  State<CustomBottomBar> createState() => _CustomBottomBarState();
-}
-
-class _CustomBottomBarState extends State<CustomBottomBar> {
   final List<TabItem> _tabItems = const [
     TabItem(icon: Icons.mic, title: 'Chat'),
     TabItem(icon: Icons.camera_alt, title: 'Camera'),
@@ -50,12 +45,15 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     final dbProvider = context.read<DBProvider>();
 
     return PopScope(
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        return CustomDialog().exitDialog(context);
+        if (!didPop) {
+          CustomDialog().exitDialog(context);
+        }
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors().darkBlue,
+          backgroundColor: AppColors.darkBlue,
           title: Text(_titles[indexProvider.index]),
           titleTextStyle: const TextStyle(
             color: Colors.white,
@@ -74,52 +72,22 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
             if (indexProvider.index == 3 || indexProvider.index == 4)
               TextButton(
                 onPressed: () {
-                  dbProvider.clearAllHistory(
-                    isHistory: indexProvider.index == 3,
-                  );
+                  dbProvider.clearAllData(isHistory: indexProvider.index == 3);
                 },
                 child: const Text(
                   "Clear all",
                   style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
+            const SizedBox(width: 20),
           ],
-          actionsPadding: const EdgeInsets.only(right: 20),
         ),
-        drawer: Drawer(
-          width: 308,
-          child: Column(
-            children: [
-              const SizedBox(height: 130),
-              Image.asset("assets/logo.png", width: 100, height: 82),
-              const SizedBox(height: 25),
-              const Text(
-                "TRANSLATE ON THE GO",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 100),
-              _buildReUseRow(Icons.share, "Share App"),
-              _buildReUseRow(Icons.star, "Rate Us"),
-              _buildReUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
-              _buildReUseRow(Icons.feed, "Feedback"),
-              const Spacer(),
-              const Text(
-                "Version 1.0",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
+        drawer: const _CustomDrawer(),
         bottomNavigationBar: ConvexAppBar(
           items: _tabItems,
           color: Colors.black,
           height: 60,
-          backgroundColor: AppColors().lightPurple,
+          backgroundColor: AppColors.lightPurple,
           activeColor: const Color.fromRGBO(0, 91, 161, 1),
           elevation: 7,
           shadowColor: Colors.black38,
@@ -136,6 +104,43 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
   }
 }
 
+class _CustomDrawer extends StatelessWidget {
+  const _CustomDrawer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      width: 308,
+      child: Column(
+        children: [
+          const SizedBox(height: 130),
+          Image.asset("assets/logo.png", width: 100, height: 82),
+          const SizedBox(height: 25),
+          const Text(
+            "TRANSLATE ON THE GO",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 100),
+          _buildReUseRow(Icons.share, "Share App"),
+          _buildReUseRow(Icons.star, "Rate Us"),
+          _buildReUseRow(Icons.privacy_tip_rounded, "Privacy Policy"),
+          _buildReUseRow(Icons.feed, "Feedback"),
+          const Spacer(),
+          const Text(
+            "Version 1.0",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+}
+
 Widget _buildReUseRow(IconData drawerIcon, String iconLabel) {
   return SizedBox(
     width: 180,
@@ -144,7 +149,7 @@ Widget _buildReUseRow(IconData drawerIcon, String iconLabel) {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Icon(drawerIcon, size: 24),
-        const SizedBox(width: 29), // Replaced spacing with SizedBox
+        const SizedBox(width: 29),
         Text(
           iconLabel,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
