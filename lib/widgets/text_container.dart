@@ -7,18 +7,23 @@ import 'package:translate_now/utils/app_colors.dart';
 import 'package:translate_now/view_modal/db_provider.dart';
 import 'package:translate_now/view_modal/translation_provider.dart';
 import 'package:translate_now/widgets/custom_buttons.dart';
+import 'package:translate_now/widgets/custom_dialog.dart';
+
+import '../view_modal/image_provider.dart';
 
 class TextContainer extends StatelessWidget {
   final bool isSource;
   final double width;
   final bool isImgRecognizer;
   final TextEditingController? textController;
+  final FocusNode? focus;
   const TextContainer({
     super.key,
     this.isSource = false,
     this.isImgRecognizer = false,
     this.width = 340,
     this.textController,
+    this.focus,
   });
 
   @override
@@ -69,19 +74,31 @@ class TextContainer extends StatelessWidget {
                 CustomButtons().customIconButton(
                   onTap:
                       isSource
+                          ? isImgRecognizer
+                              ? () {
+                                translationProvider.resetRecognized();
+                                translationProvider.setAddedToFav(false);
+                                translationProvider.setTranslationDone(false);
+                                context.read<ImgProvider>().resetImg();
+                              }
+                              : () {
+                                textController!.clear();
+                                translationProvider.setTranslationDone(false);
+                                translationProvider.setAddedToFav(false);
+                              }
+
                           ? () {
                             textController!.clear();
                             translationProvider.setAddedToFav(false);
                           }
                           : isImgRecognizer
                           ? () {
-                            translationProvider.setImgOutputText("");
-                            translationProvider.setTranslationDone(false);
+                            translationProvider.resetImgOutputText();
                             translationProvider.setAddedToFav(false);
                           }
                           : () {
-                            translationProvider.setOutputText("");
-                            translationProvider.setTranslationDone(false);
+                            translationProvider.resetOutputText();
+                            translationProvider.setAddedToFav(false);
                           },
                   icon: Icons.cancel_outlined,
                   color: appColors.darkBlue,
@@ -108,10 +125,15 @@ class TextContainer extends StatelessWidget {
                         keyboardType: TextInputType.text,
                         maxLines: 7,
                         style: const TextStyle(fontSize: 14, height: 1.2),
+                        focusNode: focus,
+                        onTapOutside: (event) {
+                          focus?.unfocus();
+                        },
                         decoration: const InputDecoration(
                           border: UnderlineInputBorder(
                             borderSide: BorderSide.none,
                           ),
+
                           hintText: "Enter text here...",
                           hintStyle: TextStyle(
                             fontSize: 14,
@@ -139,38 +161,40 @@ class TextContainer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      focus?.unfocus();
                       final input =
                           isImgRecognizer
                               ? translationProvider.recognizedText
                               : textController?.text.toString() ?? '';
                       if (input.isNotEmpty) {
-                        translationProvider
-                            .translateText(
-                              input: input,
-                              isImgRecognizer: isImgRecognizer,
-                            )
-                            .whenComplete(() {
-                              dbProvider.addData(
-                                isHistory: true,
-                                sourceLang:
-                                    isImgRecognizer
-                                        ? "en"
-                                        : translationProvider
-                                            .sourceLanguage
-                                            .bcpCode,
-                                targetLang:
-                                    translationProvider.targetLanguage.bcpCode,
-                                sourceText: input,
-                                targetText:
-                                    isImgRecognizer
-                                        ? translationProvider.imgOutputText
-                                            .toString()
-                                        : translationProvider.outputText
-                                            .toString(),
-                              );
-                            });
+                        CustomDialog().progressLoading(context);
+                        await translationProvider.translateText(
+                          input: input,
+                          isImgRecognizer: isImgRecognizer,
+                        );
+                        Navigator.of(context, rootNavigator: true).pop();
+                        dbProvider.addData(
+                          isHistory: true,
+                          sourceLang:
+                              isImgRecognizer
+                                  ? "en"
+                                  : translationProvider.sourceLanguage.bcpCode,
+                          targetLang:
+                              translationProvider.targetLanguage.bcpCode,
+                          sourceText: input,
+                          targetText:
+                              isImgRecognizer
+                                  ? translationProvider.imgOutputText.toString()
+                                  : translationProvider.outputText.toString(),
+                        );
+
                         translationProvider.setAddedToFav(false);
+                      } else {
+                        CustomDialog().flushBarMessage(
+                          context,
+                          "Empty Text!!!",
+                        );
                       }
                     },
                     child: Container(
@@ -204,6 +228,10 @@ class TextContainer extends StatelessWidget {
                         isImgRecognizer
                             ? translationProvider.imgOutputText
                             : translationProvider.outputText,
+                      );
+                      CustomDialog().flushBarMessage(
+                        context,
+                        "Copied to clipboard",
                       );
                     },
                     icon: Icons.copy_rounded,
@@ -245,6 +273,10 @@ class TextContainer extends StatelessWidget {
                                 : translationProvider.outputText.toString(),
                       );
                       translationProvider.setAddedToFav(true);
+                      CustomDialog().flushBarMessage(
+                        context,
+                        "Added to favorite",
+                      );
                     },
                     icon:
                         context.watch<TranslationProvider>().addedToFav

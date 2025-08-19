@@ -17,6 +17,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final FocusNode focus = FocusNode();
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -25,6 +26,12 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 20),
               const LanguageSelectRow(),
               const SizedBox(height: 30),
+
+              TextContainer(
+                isSource: true,
+                textController: _textController,
+                focus: focus,
+              ),
               TextContainer(isSource: true, textController: _textController),
               const SizedBox(height: 30),
               context.watch<TranslationProvider>().translationDone
