@@ -61,7 +61,8 @@ class CustomDialog {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         "Cancel",
@@ -110,14 +111,14 @@ class CustomDialog {
   Future<void> flushBarMessage(BuildContext context, String msg) {
     return Flushbar(
       message: msg,
-      margin: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      margin: EdgeInsets.only(left: 25, right: 25, bottom: 85),
       duration: Duration(seconds: 2),
-      icon: Icon(Icons.info_outline_rounded, color: AppColors().darkOrange),
+      icon: Icon(Icons.info_outline_rounded, color: AppColors.darkOrange),
       messageSize: 18,
       backgroundColor: Colors.black54,
       shouldIconPulse: false,
       borderRadius: BorderRadius.circular(5),
-      leftBarIndicatorColor: AppColors().darkOrange,
+      leftBarIndicatorColor: AppColors.darkOrange,
       messageColor: Colors.white,
     ).show(context);
   }
@@ -129,8 +130,8 @@ class CustomDialog {
       builder: (context) {
         return Center(
           child: CircularProgressIndicator(
-            color: AppColors().darkBlue,
-            backgroundColor: AppColors().lightPurple,
+            color: AppColors.darkBlue,
+            backgroundColor: AppColors.lightPurple,
           ),
         );
       },

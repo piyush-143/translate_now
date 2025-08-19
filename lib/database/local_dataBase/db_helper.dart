@@ -7,19 +7,23 @@ import 'package:sqflite/sqflite.dart';
 class DBHelper {
   DBHelper._();
   static final DBHelper getInstance = DBHelper._();
+
   static const String historyTableName = "HistoryTable";
   static const String hSno = "HistorySno";
   static const String hSourceName = "SourceText";
   static const String hTargetName = "TargetText";
   static const String hSourceLang = "SourceLanguage";
   static const String hTargetLang = "TargetLanguage";
+
   static const String favouriteTableName = "FavouriteTable";
   static const String fSno = "FavouriteSno";
   static const String fSourceName = "SourceText";
   static const String fTargetName = "TargetText";
   static const String fSourceLang = "SourceLanguage";
   static const String fTargetLang = "TargetLanguage";
+
   Database? _myDb;
+
   Future<Database> getDb() async {
     if (_myDb != null) {
       return _myDb!;
@@ -31,6 +35,7 @@ class DBHelper {
   Future<Database> openDb() async {
     Directory dir = await getApplicationDocumentsDirectory();
     String dbPath = join(dir.path, "languageTranslatorDb.db");
+
     return await openDatabase(
       dbPath,
       onCreate: (db, version) {
@@ -45,7 +50,7 @@ class DBHelper {
     );
   }
 
-  Future<bool> addHistory({
+  Future<bool> addData({
     required String sourceLang,
     required String targetLang,
     required String sourceText,
@@ -53,6 +58,7 @@ class DBHelper {
     required bool isHistory,
   }) async {
     var db = await getDb();
+
     int rowEffected =
         isHistory
             ? await db.insert(historyTableName, {
@@ -70,11 +76,9 @@ class DBHelper {
     return rowEffected > 0;
   }
 
-  Future<bool> deleteHistory({
-    required int sno,
-    required bool isHistory,
-  }) async {
+  Future<bool> deleteData({required int sno, required bool isHistory}) async {
     var db = await getDb();
+
     int rowEffected =
         isHistory
             ? await db.delete(
@@ -91,8 +95,9 @@ class DBHelper {
     return rowEffected > 0;
   }
 
-  Future<bool> deleteAllHistory({required bool isHistory}) async {
+  Future<bool> clearAllData({required bool isHistory}) async {
     var db = await getDb();
+
     int rowEffected =
         isHistory
             ? await db.rawDelete("DELETE FROM $historyTableName")
