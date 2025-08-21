@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomButtons {
-  Widget customIconButton({
+  const CustomButtons();
+  Widget iconButton({
     required VoidCallback onTap,
     required IconData icon,
     Color color = Colors.white,
@@ -10,7 +11,7 @@ class CustomButtons {
     return InkWell(onTap: onTap, child: Icon(icon, size: size, color: color));
   }
 
-  Widget customMicButton({
+  Widget micButton({
     required VoidCallback onTap,
     required IconData icon,
     Color color = Colors.white,

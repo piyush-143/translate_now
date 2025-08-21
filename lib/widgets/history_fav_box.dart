@@ -5,7 +5,7 @@ import 'package:translate_now/widgets/custom_buttons.dart';
 
 import '../utils/app_colors.dart';
 
-class ChatBox extends StatelessWidget {
+class HistoryFavBox extends StatelessWidget {
   final bool isFav;
   final int sno;
   final String sourceLang;
@@ -13,7 +13,7 @@ class ChatBox extends StatelessWidget {
   final String targetLang;
   final String targetText;
 
-  const ChatBox({
+  const HistoryFavBox({
     required this.sourceLang,
     required this.targetLang,
     required this.sourceText,
@@ -30,7 +30,7 @@ class ChatBox extends StatelessWidget {
       height: 107,
       margin: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: AppColors().lightPurple,
+        color: AppColors.lightPurple,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -47,21 +47,21 @@ class ChatBox extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildReUseRow(
+            _buildChatRow(
               isSource: true,
               lang: sourceLang,
               text: sourceText,
               isFav: isFav,
-              db: dbProvider,
+              dbProvider: dbProvider,
               sno: sno,
             ),
             Divider(color: Colors.grey.shade400, height: 10),
-            _buildReUseRow(
+            _buildChatRow(
               isSource: false,
               lang: targetLang,
               text: targetText,
               isFav: isFav,
-              db: dbProvider,
+              dbProvider: dbProvider,
               sno: sno,
             ),
           ],
@@ -69,52 +69,59 @@ class ChatBox extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget _buildReUseRow({
-  required bool isSource,
-  required String lang,
-  required String text,
-  required bool isFav,
-  required DBProvider db,
-  required int sno,
-}) {
-  return Row(
-    children: [
-      Text(
-        lang,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-      ),
-      const SizedBox(width: 20),
-      Expanded(
-        child: Text(
-          text,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isSource ? AppColors().darkBlue : AppColors().darkOrange,
+  Widget _buildChatRow({
+    required bool isSource,
+    required String lang,
+    required String text,
+    required bool isFav,
+    required DBProvider dbProvider,
+    required int sno,
+  }) {
+    return Expanded(
+      child: Row(
+        children: [
+          Text(
+            lang,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
-        ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isSource ? AppColors.darkBlue : AppColors.darkOrange,
+              ),
+            ),
+          ),
+          if (isSource)
+            _buildActionButton(isFav: isFav, dbProvider: dbProvider, sno: sno),
+        ],
       ),
-      isSource
-          ? isFav
-              ? CustomButtons().customIconButton(
-                onTap: () {
-                  db.deleteData(sno: sno, isHistory: false);
-                },
-                icon: Icons.star,
-                color: AppColors().darkBlue,
-              )
-              : CustomButtons().customIconButton(
-                onTap: () {
-                  db.deleteData(sno: sno, isHistory: true);
-                },
-                icon: Icons.delete,
-                color: AppColors().darkBlue,
-              )
-          : const SizedBox.shrink(),
-    ],
-  );
+    );
+  }
+
+  Widget _buildActionButton({
+    required bool isFav,
+    required DBProvider dbProvider,
+    required int sno,
+  }) {
+    if (isFav) {
+      return CustomButtons().iconButton(
+        onTap: () => dbProvider.deleteData(sno: sno, isHistory: false),
+        icon: Icons.star,
+        color: AppColors.darkBlue,
+      );
+    } else {
+      return CustomButtons().iconButton(
+        onTap: () => dbProvider.deleteData(sno: sno, isHistory: true),
+        icon: Icons.delete,
+        color: AppColors.darkBlue,
+      );
+    }
+  }
 }

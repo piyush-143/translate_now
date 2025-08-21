@@ -7,11 +7,4 @@ class BottomAppBarProvider with ChangeNotifier {
     _index = idx;
     notifyListeners();
   }
-
-  bool _isSelected = false;
-  bool get isSelected => _isSelected;
-  void setIsSelected({required bool isSelect}) {
-    _isSelected = isSelect;
-    notifyListeners();
-  }
 }

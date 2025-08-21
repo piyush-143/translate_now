@@ -17,7 +17,6 @@
         <!-- Query for Telegram -->
         <package android:name="org.telegram.messenger" />
     </queries>
-
     <application
         android:label="Translate Now"
         android:name="${applicationName}"

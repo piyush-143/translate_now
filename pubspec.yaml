@@ -47,7 +47,6 @@ dependencies:
   path: ^1.9.1
   path_provider: ^2.1.5
   share_plus: ^11.0.0
-  social_sharing_plus: ^1.2.3
   easy_stars: ^1.0.9
   another_flushbar: ^1.12.30
   speech_to_text: ^7.3.0
