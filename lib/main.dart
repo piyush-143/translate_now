@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => SpeechToTextProvider()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Translate Now',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSwatch(),
